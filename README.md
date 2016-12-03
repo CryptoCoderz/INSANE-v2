@@ -26,7 +26,46 @@
 
 <p>All necessary details about links to faucets, dice, blackjack and so on, can be found listed there.</p>
 
-<p>Details about the coin burn session on 3rd December can also be foun there. There will be about a 17% reduction in available coins. Remember to deduct 3,700,000 coins from the explorer's "coin supply," i.e. 22.1 million coins will reduced by 3.7 million equals a 18.4 million available coins. Nine Burn addresses have been created with explcit reference to "Coin Destruction." These are all labeled for public viewing.</p>
+# 3.7 million INSANE destroyed #
+
+<p>Details about the coin burn session on 3rd December are as follows: There was a 17% reduction in available coins. Remember to deduct 3,700,000 coins from the explorer's "coin supply," i.e. 22.1 million coins reduced by 3.7 million equals a 18.4 million available coins. Nine Burn addresses were created with explcit reference to "Coin Destruction." These are all labeled for public viewing.</p>
+
+ia1TheseCoinsAreDestroyedXXXag2RaB 411,111.11111111 INSANE
+af096e711a0418faea3bcf692b8ecf23cb8cdcf3ca7f9c09cb2029ddbeb23cfc
+http://insanecoin.thecryptochat.net/address/ia1TheseCoinsAreDestroyedXXXag2RaB
+
+ib2TheseCoinsAreDestroyedXXXWeJe5J 411,111.11111111 INSANE
+dd8565298144198ad919f6a5c8804cb4211ac2d98f20c9e0c597be15daa04c05
+http://insanecoin.thecryptochat.net/address/ib2TheseCoinsAreDestroyedXXXWeJe5J
+
+ic3TheseCoinsAreDestroyedXXXZgJvjZ 411,111.11111111 INSANE
+e45c6ef42b9132119cfbd2dc4765f305b9bcd95d5b9798fcd5970bda080cd04c
+http://insanecoin.thecryptochat.net/address/ic3TheseCoinsAreDestroyedXXXZgJvjZ
+
+id4TheseCoinsAreDestroyedXXXTxRgDz 411,111.11111111 INSANE
+d14800df1a05611da9ce4687f73f09ed51e3df0ec04195fe348926bb1d723f8e
+http://insanecoin.thecryptochat.net/address/id4TheseCoinsAreDestroyedXXXTxRgDz
+
+ie5TheseCoinsAreDestroyedXXXXmzsDw 411,111.11111111 INSANE
+ab0bfc9a3ee68ec0e149019e317e4c277e9630ed4ec4d4b293ae62f3ce7f4ee0
+http://insanecoin.thecryptochat.net/address/ie5TheseCoinsAreDestroyedXXXXmzsDw
+
+if6TheseCoinsAreDestroyedXXXTYV1Yr 411,111.11111111 INSANE
+efc990177775a9c80d7f492a9e4dba61d174b99ce225f4fe92907454710aedac
+http://insanecoin.thecryptochat.net/address/if6TheseCoinsAreDestroyedXXXTYV1Yr
+
+ig7TheseCoinsAreDestroyedXXXZez5MJ 411,111.11111111 INSANE
+40bd2db4d54febc16c5ccb4229c34561f938db350cc3614f17f3c7326af60746
+http://insanecoin.thecryptochat.net/address/ig7TheseCoinsAreDestroyedXXXZez5MJ
+
+ih8TheseCoinsAreDestroyedXXXYf9CT3 411,111.11111111 INSANE
+f627719455cb1556c33da5c223b7679b102b1e5958c9842cdeb97b78c4be7b15
+http://insanecoin.thecryptochat.net/address/ih8TheseCoinsAreDestroyedXXXYf9CT3
+
+ii9TheseCoinsAreDestroyedXXXbLUzgL 411,111.11111111 INSANE
+1e3366c8a030499a8dcc49045a9b850a2e649de7fa747f2fb86964910c8af82f
+http://insanecoin.thecryptochat.net/address/ii9TheseCoinsAreDestroyedXXXbLUzgL
+
 
 ----
 
