@@ -1,0 +1,31 @@
+Insane: Original Hash, Merkle Root, Unix Time and Nonce
+
+Insanecoin
+
+
+
+
+  {
+  "hash": "0000070752e39f4b9b3025ecc352b684691e67f43607100159d56b52e0a3cc64", // Genesis
+  "confirmations": 9966,
+  "size": 159,
+  "height": 0,
+  "version": 1,
+  "merkleroot": "0693303342b4c9f8e66d64fea27392915dc7b70a00cc1c912793611bc42d0cb0", // Hash Merkle Root
+  "mint": 0,
+  "time": 1476728431, // Unix Time
+  "nonce": 1571167, // Nonce
+  "bits": "1e0fffff",
+  "difficulty": 0.00024414,
+  "blocktrust": "100001",
+  "chaintrust": "100001",
+  "nextblockhash": "00000db71320614c35bc9472241866cc2731fc77d0f7aa7b74996bcf204f9d21",
+  "flags": "proof-of-work stake-modifier",
+  "proofhash": "0000070752e39f4b9b3025ecc352b684691e67f43607100159d56b52e0a3cc64",
+  "entropybit": 0,
+  "modifier": "0000000000000000",
+  "modifierchecksum": "fd11f4e7",
+  "tx": [
+    "0693303342b4c9f8e66d64fea27392915dc7b70a00cc1c912793611bc42d0cb0"
+  ]
+}
