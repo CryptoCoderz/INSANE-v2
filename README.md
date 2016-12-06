@@ -89,7 +89,7 @@ http://insanecoin.thecryptochat.net/address/ii9TheseCoinsAreDestroyedXXXbLUzgL
 # Mining 14000 blocks # 
 
 
-<p>Mining is available at <a href="http://cryptomine.co.uk:8080/" target="_blank">CRYPTOMINE.CO.UK</a> with 3 ports and difficulties (0.01, 0.1 and 0.5). Anything over 250 MH, is probably best paced on port 3021 (0.5 difficulty).  </p>
+<p>Mining is available at <a href="http://cryptomine.co.uk:8080/" target="_blank">CRYPTOMINE.CO.UK</a> with 3 ports and difficulties (0.01, 0.1 and 0.5). Anything over 250 MH, is probably best paced on port 3017 (0.5 difficulty).  </p>
 
 ----
 
