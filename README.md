@@ -86,11 +86,10 @@ http://insanecoin.thecryptochat.net/address/ii9TheseCoinsAreDestroyedXXXbLUzgL
 
 ----
 
-# Mining 14000 blocks #
+# Mining 14000 blocks # 
 
 
-
-<p>Mining is available at <a href="http://cryptominers.online:8080/getting_started" target="_blank">CRYPTOMINERS.ONLINE</a> with 3 ports and difficulties (0.01, 0.1 and 0.5). Anything over 250 MH, is probably best paced on port 3021 (0.5 difficulty). You can also try <a href="http://crunck.tech:85/getting_started" target="_blank">CRUNCK.TECH</a>, although there is 1 difficulty level at 0.001 </p>
+<p>Mining is available at <a href="http://cryptomine.co.uk:8080/" target="_blank">CRYPTOMINE.CO.UK</a> with 3 ports and difficulties (0.01, 0.1 and 0.5). Anything over 250 MH, is probably best paced on port 3021 (0.5 difficulty).  </p>
 
 ----
 
