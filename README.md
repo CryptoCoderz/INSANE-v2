@@ -104,9 +104,9 @@ http://insanecoin.thecryptochat.net/address/ii9TheseCoinsAreDestroyedXXXbLUzgL
 
 <p>An explorer is running here, which replaces the one I had put up, (it is the same familiar Iquidus):</p>
 
-<p><a href="http://explorer.insanecoin.com:3001/" target="_blank">explorer.insanecoin.com</a></p>
+<p><a href="http://insanecoin.thecryptochat.net/" target="_blank">insanecoin.thecrypyochat.com</a></p>
 
-<p>If the above link does not work use a directlink to: <br />
+<p>If the above link does not work copy paste: <br />
 
 insanecoin.thecryptochat.net</p>
 
