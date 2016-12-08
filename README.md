@@ -123,23 +123,10 @@ rpcallowip=127.0.0.1<br />
 listen=1<br />
 rpcport=8029<br />
 port=8028<br /><br />
-NODES<br /><br />
-addnode=91.121.67.93<br />
-addnode=37.220.9.226<br />
-addnode=216.189.144.26<br />
-addnode=198.74.56.141<br />
-addnode=93.79.198.241<br />
-addnode=148.251.8.18<br />
-addnode=84.200.210.130<br />
-addnode=149.56.154.75<br />
-addnode=78.70.227.24<br />
-addnode=91.121.67.93<br />
-addnode=192.95.29.72<br />
-addnode=79.56.59.47<br />
-addnode=212.87.177.98<br />
-addnode=112.203.122.145<br />
-addnode=182.182.60.124<br />
-addnode=explorer.insanecoin.com</p>
+NODES<br />
+<p>Nodes change, so rather than give some that suddenly disappear, just check the below for the latest network connections:<br />
+<a href="http://insanecoin.thecryptochat.net/networktarget" target="_blank">The Cryptochat Explorer's "Network" (menu) </a> 
+</p>
 
 <p>You can also try:<br />
 IRC=1<br />
