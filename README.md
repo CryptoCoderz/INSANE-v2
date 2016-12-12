@@ -16,7 +16,8 @@
 - Minimum Stake Age is 12 hours
 - Maximum Stake Age is 120 hours
 
->Trumpinsane and Insanecoin were both developed by Mountaind
+>Trumpinsane and Insanecoin were both developed by Mountaind. 
+>The wallet-qt for insane was made by Crunck, who also re-mined the genesis block.
 
 ----
 
