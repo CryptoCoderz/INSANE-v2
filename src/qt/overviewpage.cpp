@@ -9,8 +9,22 @@
 #include "guiutil.h"
 #include "guiconstants.h"
 
+#include "main.h"
+#include "wallet.h"
+#include "base58.h"
+#include "transactionrecord.h"
+#include "init.h"
+#include "bitcoinrpc.h"
+#include "kernel.h"
+
 #include <QAbstractItemDelegate>
 #include <QPainter>
+#include <QTimer>
+
+using namespace json_spirit;
+
+#include <sstream>
+#include <string>
 
 #define DECORATION_SIZE 64
 #define NUM_ITEMS 3
@@ -115,6 +129,9 @@ OverviewPage::OverviewPage(QWidget *parent) :
 
     // start with displaying the "out of sync" warnings
     showOutOfSyncWarning(true);
+
+    // start guage timer
+    QTimer::singleShot(20000,this,SLOT(blockCalled()));
 }
 
 void OverviewPage::handleTransactionClicked(const QModelIndex &index)
@@ -195,3 +212,207 @@ void OverviewPage::showOutOfSyncWarning(bool fShow)
     ui->labelWalletStatus->setVisible(fShow);
     ui->labelTransactionsStatus->setVisible(fShow);
 }
+
+std::string getPoSHash(int Height)
+{
+    if(Height < 0) { return "351c6703813172725c6d660aa539ee6a3d7a9fe784c87fae7f36582e3b797058"; }
+    int desiredheight;
+    desiredheight = Height;
+    if (desiredheight < 0 || desiredheight > nBestHeight)
+        return 0;
+
+    CBlock block;
+    CBlockIndex* pblockindex = mapBlockIndex[hashBestChain];
+    while (pblockindex->nHeight > desiredheight)
+        pblockindex = pblockindex->pprev;
+    return pblockindex->phashBlock->GetHex();
+}
+
+
+double getPoSHardness(int height)
+{
+    const CBlockIndex* blockindex = getPoSIndex(height);
+
+    int nShift = (blockindex->nBits >> 24) & 0xff;
+
+    double dDiff =
+        (double)0x0000ffff / (double)(blockindex->nBits & 0x00ffffff);
+
+    while (nShift < 29)
+    {
+        dDiff *= 256.0;
+        nShift++;
+    }
+    while (nShift > 29)
+    {
+        dDiff /= 256.0;
+        nShift--;
+    }
+
+    return dDiff;
+
+}
+
+const CBlockIndex* getPoSIndex(int height)
+{
+    std::string hex = getPoSHash(height);
+    uint256 hash(hex);
+    return mapBlockIndex[hash];
+}
+
+int getPoSTime(int Height)
+{
+    std::string strHash = getPoSHash(Height);
+    uint256 hash(strHash);
+
+    if (mapBlockIndex.count(hash) == 0)
+        return 0;
+
+    CBlock block;
+    CBlockIndex* pblockindex = mapBlockIndex[hash];
+    return pblockindex->nTime;
+}
+
+int PoSInPastHours(int hours)
+{
+    int wayback = hours * 3600;
+    bool check = true;
+    int height = pindexBest->nHeight;
+    int heightHour = pindexBest->nHeight;
+    int utime = (int)time(NULL);
+    int target = utime - wayback;
+
+    while(check)
+    {
+        if(getPoSTime(heightHour) < target)
+        {
+            check = false;
+            return height - heightHour;
+        } else {
+            heightHour = heightHour - 1;
+        }
+    }
+
+    return 0;
+}
+
+double convertPoSCoins(int64_t amount)
+{
+    return (double)amount / (double)COIN;
+}
+
+void OverviewPage::updatePoSstat(bool stat)
+{
+    if(stat)
+    {
+        uint64_t nMinWeight = 0, nMaxWeight = 0, nWeight = 0;
+        if (pwalletMain)
+            nWeight = pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight);
+        uint64_t nNetworkWeight = GetPoSKernelPS();
+        bool staking = nLastCoinStakeSearchInterval && nWeight;
+        uint64_t nExpectedTime = staking ? (nTargetSpacing * nNetworkWeight / nWeight) : 0;
+        QString Qseconds = " Second(s)";
+        if(nExpectedTime > 86399)
+        {
+           nExpectedTime = nExpectedTime / 60 / 60 / 24;
+           Qseconds = " Day(s)";
+        }
+        else if(nExpectedTime > 3599)
+        {
+           nExpectedTime = nExpectedTime / 60 / 60;
+           Qseconds = " Hour(s)";
+        }
+        else if(nExpectedTime > 59)
+        {
+           nExpectedTime = nExpectedTime / 60;
+           Qseconds = " Minute(s)";
+        }
+        ui->lbTime->show();
+        ui->diffdsp->show();;
+        ui->hashrt->show();
+        int height = pindexBest->nHeight;
+        uint64_t Pawrate = GetPoSKernelPS();
+        double Pawrate2 = ((double)Pawrate / 1);
+        QString QPawrate = QString::number(Pawrate2, 'f', 2);
+        ui->hashrt->setText(QPawrate + " INSANE");
+        if(Pawrate2 > 999999999)
+        {
+           Pawrate2 = (Pawrate2 / 1000000000);
+           QPawrate = QString::number(Pawrate2, 'f', 2);
+           ui->hashrt->setText(QPawrate + " BILLION INSANE");
+        }
+        else if(Pawrate2 > 999999)
+        {
+           Pawrate2 = (Pawrate2 / 1000000);
+           QPawrate = QString::number(Pawrate2, 'f', 2);
+           ui->hashrt->setText(QPawrate + " MILLION INSANE");
+        }
+        else if(Pawrate2 > 999)
+        {
+           Pawrate2 = (Pawrate2 / 1000);
+           QPawrate = QString::number(Pawrate2, 'f', 2);
+           ui->hashrt->setText(QPawrate + " THOUSAND INSANE");
+        }
+        double hardness = getPoSHardness(height);
+        uint64_t nStakePercentage = (double)nWeight / (double)nNetworkWeight * 100;
+        uint64_t nNetPercentage = (100 - (double)nStakePercentage);
+        if(nWeight > nNetworkWeight)
+        {
+            nStakePercentage = (double)nNetworkWeight / (double)nWeight * 100;
+            nNetPercentage = (100 - (double)nStakePercentage);
+        }
+        CBlockIndex* pindex = pindexBest;;
+        QString QHardness = QString::number(hardness, 'f', 6);
+        QString QStakePercentage = QString::number(nStakePercentage, 'f', 2);
+        QString QNetPercentage = QString::number(nNetPercentage, 'f', 2);
+        QString QTime = clientModel->getLastBlockDate().toString();
+        QString QExpect = QString::number(nExpectedTime, 'f', 0);;
+        QString QStaking = "DISABLED";
+        QString QStakeEN = "NOT STAKING";
+        ui->estnxt->setText(QExpect + Qseconds);
+        ui->stkstat->setText(QStakeEN);
+        if(!pindex->IsProofOfStake())
+        {
+            QHardness = "Block is PoW";
+            QPawrate = "Block is PoW";
+            ui->hashrt->setText(QPawrate);
+        }
+        if(nExpectedTime == 0)
+        {
+            QExpect = "NOT STAKING";
+            ui->estnxt->setText(QExpect);
+        }
+        if(staking)
+        {
+            QStakeEN = "STAKING";
+            ui->stkstat->setText(QStakeEN);
+        }
+        if(GetBoolArg("-staking", true))
+        {
+            QStaking = "ENABLED";
+        }
+        ui->lbTime->setText(QTime);
+        ui->diffdsp->setText(QHardness);
+        ui->stken->setText(QStaking);
+        ui->urwheight->setValue(QStakePercentage.toDouble());
+        ui->netweight->setValue(QNetPercentage.toDouble());
+        if(nStakePercentage < 1)
+        {
+            ui->urwheight->setValue(1);
+            ui->netweight->setValue(99);
+        }
+// TODO: DISPLAY STAKING STATISTICS
+        ui->hourlydsp->setText("0");
+        ui->dailydsp->setText("0");
+        ui->weeklydsp->setText("0");
+        ui->monthlydsp->setText("0");
+
+        QTimer::singleShot(10000,this,SLOT(blockCalled()));
+    }
+}
+
+void OverviewPage::blockCalled()
+{
+    updatePoSstat(true);
+}
+

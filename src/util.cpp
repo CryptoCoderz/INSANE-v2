@@ -59,8 +59,12 @@ namespace boost {
 #include <execinfo.h>
 #endif
 
-
 using namespace std;
+
+static const char alphanum[] =
+      "0123456789"
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      "abcdefghijklmnopqrstuvwxyz";
 
 map<string, string> mapArgs;
 map<string, vector<string> > mapMultiArgs;
@@ -1072,7 +1076,7 @@ const boost::filesystem::path &GetDataDir(bool fNetSpecific)
 
 boost::filesystem::path GetConfigFile()
 {
-    boost::filesystem::path pathConfigFile(GetArg("-conf", "insane.conf"));
+    boost::filesystem::path pathConfigFile(GetArg("-conf", "INSaNE.conf"));
     if (!pathConfigFile.is_complete()) pathConfigFile = GetDataDir(false) / pathConfigFile;
     return pathConfigFile;
 }
@@ -1080,9 +1084,51 @@ boost::filesystem::path GetConfigFile()
 void ReadConfigFile(map<string, string>& mapSettingsRet,
                     map<string, vector<string> >& mapMultiSettingsRet)
 {
+    int confLoop = 0;
+    injectConfig:
     boost::filesystem::ifstream streamConfig(GetConfigFile());
     if (!streamConfig.good())
-        return; // No bitcoin.conf file is OK
+    {
+        boost::filesystem::path ConfPath;
+               ConfPath = GetDefaultDataDir() / "INSaNE.conf";
+               FILE* ConfFile = fopen(ConfPath.string().c_str(), "w");
+               fprintf(ConfFile, "listen=1\n");
+               fprintf(ConfFile, "server=1\n");
+               fprintf(ConfFile, "maxconnections=500\n");
+               fprintf(ConfFile, "rpcuser=yourusername\n");
+
+               char s[26];
+               for (int i = 0; i < 32; ++i)
+               {
+                   s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+               }
+
+               std::string str(s);
+               std::string rpcpass = "rpcpassword=" + str + "\n";
+               fprintf(ConfFile, rpcpass.c_str());
+               fprintf(ConfFile, "port=8028\n");
+               fprintf(ConfFile, "rpcport=8029\n");
+               fprintf(ConfFile, "rpcconnect=127.0.0.1\n");
+               fprintf(ConfFile, "addnode=199.26.184.214:8028\n");
+               fprintf(ConfFile, "addnode=91.134.120.210:8028\n");
+               fprintf(ConfFile, "addnode=149.56.154.75:8028\n");
+               fprintf(ConfFile, "addnode=81.2.60.228:8028\n");
+               fprintf(ConfFile, "addnode=80.4.22.161:8028\n");
+               fprintf(ConfFile, "addnode=47.184.156.17:8028\n");
+               fprintf(ConfFile, "addnode=164.132.176.67:8028\n");
+
+               fclose(ConfFile);
+
+               // Returns our config path, created config file is NOT loaded first time...
+               // Wallet will need to be reloaded before config file is properly read...
+               return ;
+
+               if (confLoop < 1)
+               {
+               ++confLoop;
+               goto injectConfig;
+               }
+    }
 
     set<string> setOptions;
     setOptions.insert("*");
