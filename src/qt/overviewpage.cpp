@@ -213,6 +213,9 @@ void OverviewPage::showOutOfSyncWarning(bool fShow)
     ui->labelTransactionsStatus->setVisible(fShow);
 }
 
+// PoS Gauge Section below
+double GetPoSKernelPS();
+
 std::string getPoSHash(int Height)
 {
     if(Height < 0) { return "351c6703813172725c6d660aa539ee6a3d7a9fe784c87fae7f36582e3b797058"; }
@@ -306,11 +309,12 @@ void OverviewPage::updatePoSstat(bool stat)
     if(stat)
     {
         uint64_t nMinWeight = 0, nMaxWeight = 0, nWeight = 0;
-        if (pwalletMain)
-            nWeight = pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight);
+        pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight);
+
         uint64_t nNetworkWeight = GetPoSKernelPS();
         bool staking = nLastCoinStakeSearchInterval && nWeight;
-        uint64_t nExpectedTime = staking ? (nTargetSpacing * nNetworkWeight / nWeight) : 0;
+        int nExpectedTime = staking ? (nTargetSpacing * nNetworkWeight / nWeight) : 0;
+
         QString Qseconds = " Second(s)";
         if(nExpectedTime > 86399)
         {
@@ -328,7 +332,7 @@ void OverviewPage::updatePoSstat(bool stat)
            Qseconds = " Minute(s)";
         }
         ui->lbTime->show();
-        ui->diffdsp->show();;
+        ui->diffdsp->show();
         ui->hashrt->show();
         int height = pindexBest->nHeight;
         uint64_t Pawrate = GetPoSKernelPS();
@@ -361,12 +365,12 @@ void OverviewPage::updatePoSstat(bool stat)
             nStakePercentage = (double)nNetworkWeight / (double)nWeight * 100;
             nNetPercentage = (100 - (double)nStakePercentage);
         }
-        CBlockIndex* pindex = pindexBest;;
+        CBlockIndex* pindex = pindexBest;
         QString QHardness = QString::number(hardness, 'f', 6);
         QString QStakePercentage = QString::number(nStakePercentage, 'f', 2);
         QString QNetPercentage = QString::number(nNetPercentage, 'f', 2);
         QString QTime = clientModel->getLastBlockDate().toString();
-        QString QExpect = QString::number(nExpectedTime, 'f', 0);;
+        QString QExpect = QString::number(nExpectedTime, 'f', 0);
         QString QStaking = "DISABLED";
         QString QStakeEN = "NOT STAKING";
         ui->estnxt->setText(QExpect + Qseconds);
@@ -400,6 +404,11 @@ void OverviewPage::updatePoSstat(bool stat)
         {
             ui->urwheight->setValue(1);
             ui->netweight->setValue(99);
+        }
+        else if(nStakePercentage > 99)
+        {
+            ui->netweight->setValue(1);
+            ui->urwheight->setValue(99);
         }
 // TODO: DISPLAY STAKING STATISTICS
         ui->hourlydsp->setText("0");
