@@ -78,8 +78,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     notificator(0),
     rpcConsole(0)
 {
-    resize(850, 550);
-    setWindowTitle(tr("insane") + " - " + tr("Wallet"));
+    resize(850+142, 550);
+    setWindowTitle(tr("insane") + " - " + tr("Client"));
     // Prevent resizing.
     setFixedSize(size());
     // Remove "hand" cursor from status bar.
@@ -116,6 +116,10 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     setUnifiedTitleAndToolBarOnMac(true);
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
+
+    setObjectName("INSaNE");
+    setStyleSheet("#INSaNE { background-color: #ffffff}"); //qradialgradient(cx: -0.8, cy: 0, fx: -0.8, fy: 0, radius: 1.4, stop: 0 #499bea, stop: 1 #207ce5
+
     // Accept D&D of URIs
     setAcceptDrops(true);
 
@@ -156,13 +160,24 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
 
     blockBrowser = new BlockBrowser(this);
 
-    centralWidget = new QStackedWidget(this);
-    centralWidget->addWidget(overviewPage);
-    centralWidget->addWidget(transactionsPage);
-    centralWidget->addWidget(addressBookPage);
-    centralWidget->addWidget(receiveCoinsPage);
-    centralWidget->addWidget(sendCoinsPage);
-    centralWidget->addWidget(blockBrowser);
+    centralStackedWidget = new QStackedWidget(this);
+    centralStackedWidget->setContentsMargins(0, 0, 0, 0);
+    centralStackedWidget->addWidget(overviewPage);
+    centralStackedWidget->addWidget(transactionsPage);
+    centralStackedWidget->addWidget(addressBookPage);
+    centralStackedWidget->addWidget(receiveCoinsPage);
+    centralStackedWidget->addWidget(sendCoinsPage);
+    centralStackedWidget->addWidget(blockBrowser);
+
+    QWidget *centralWidget = new QWidget();
+    QVBoxLayout *centralLayout = new QVBoxLayout(centralWidget);
+    centralLayout->setContentsMargins(0,0,0,0);
+    centralWidget->setContentsMargins(0,0,0,0);
+#ifndef Q_OS_MAC
+    centralLayout->addWidget(appMenuBar);
+#endif
+    centralLayout->addWidget(centralStackedWidget);
+
     setCentralWidget(centralWidget);
 
     // Create status bar
@@ -385,19 +400,57 @@ void BitcoinGUI::createToolBars()
 {
     QToolBar *toolbar = addToolBar(tr("Tabs toolbar"));
     toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
+    toolbar->setObjectName("tabs");
+    toolbar->setStyleSheet("QToolButton { color: #505050; font-weight:bold;} QToolButton:hover { background-color: #909090 } QToolButton:checked { background-color: #f1f1f1 } QToolButton:pressed { background-color: #101010 } #tabs { color: #505050; background-color: #ffffff; }");
+    toolbar->setIconSize(QSize(24,24));
+    
+    QLabel* header = new QLabel();
+    header->setMinimumSize(142, 142);
+    header->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    header->setPixmap(QPixmap(":/images/header"));
+    header->setMaximumSize(142,142);
+    header->setScaledContents(true);
+    toolbar->addWidget(header);
+
     toolbar->addAction(overviewAction);
     toolbar->addAction(sendCoinsAction);
     toolbar->addAction(receiveCoinsAction);
     toolbar->addAction(historyAction);
     toolbar->addAction(addressBookAction);
     toolbar->addAction(blockBrowserAction);
+    toolbar->addAction(exportAction);
     toolbar->setMovable(false);
 
-    QToolBar *toolbar2 = addToolBar(tr("Actions toolbar"));
-    toolbar2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    toolbar2->addAction(exportAction);
-    toolbar2->setMovable(false);
+  //  QToolBar *toolbar2 = addToolBar(tr("Actions toolbar"));
+  //  toolbar2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  //  toolbar2->addAction(exportAction);
+  //  toolbar2->setMovable(false);
+
+
+   // toolbar->addWidget(makeToolBarSpacer());
+
+    toolbar->setOrientation(Qt::Vertical);
+    toolbar->setMovable(false);
+
+    addToolBar(Qt::LeftToolBarArea, toolbar);
+
+    foreach(QAction *action, toolbar->actions()) {
+          toolbar->widgetForAction(action)->setFixedWidth(145);
+    }
+
+    // toolbar2->addWidget(makeToolBarSpacer());
+
+  //  toolbar2->setOrientation(Qt::Vertical);
+  //  toolbar2->setMovable(false);
+
+   // addToolBar(Qt::LeftToolBarArea, toolbar2);
+
+  //  foreach(QAction *action, toolbar2->actions()) {
+  //        toolbar2->widgetForAction(action)->setFixedWidth(145);
+  //  }
 }
+
 
 void BitcoinGUI::setClientModel(ClientModel *clientModel)
 {
@@ -752,7 +805,7 @@ void BitcoinGUI::incomingTransaction(const QModelIndex & parent, int start, int 
 void BitcoinGUI::gotoOverviewPage()
 {
     overviewAction->setChecked(true);
-    centralWidget->setCurrentWidget(overviewPage);
+    centralStackedWidget->setCurrentWidget(overviewPage);
 
     exportAction->setEnabled(false);
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);
@@ -761,7 +814,7 @@ void BitcoinGUI::gotoOverviewPage()
 void BitcoinGUI::gotoHistoryPage()
 {
     historyAction->setChecked(true);
-    centralWidget->setCurrentWidget(transactionsPage);
+    centralStackedWidget->setCurrentWidget(transactionsPage);
 
     exportAction->setEnabled(true);
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);
@@ -771,7 +824,7 @@ void BitcoinGUI::gotoHistoryPage()
 void BitcoinGUI::gotoAddressBookPage()
 {
     addressBookAction->setChecked(true);
-    centralWidget->setCurrentWidget(addressBookPage);
+    centralStackedWidget->setCurrentWidget(addressBookPage);
 
     exportAction->setEnabled(true);
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);
@@ -781,7 +834,7 @@ void BitcoinGUI::gotoAddressBookPage()
 void BitcoinGUI::gotoReceiveCoinsPage()
 {
     receiveCoinsAction->setChecked(true);
-    centralWidget->setCurrentWidget(receiveCoinsPage);
+    centralStackedWidget->setCurrentWidget(receiveCoinsPage);
 
     exportAction->setEnabled(true);
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);
@@ -791,7 +844,7 @@ void BitcoinGUI::gotoReceiveCoinsPage()
 void BitcoinGUI::gotoSendCoinsPage()
 {
     sendCoinsAction->setChecked(true);
-    centralWidget->setCurrentWidget(sendCoinsPage);
+    centralStackedWidget->setCurrentWidget(sendCoinsPage);
 
     exportAction->setEnabled(false);
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);
@@ -800,7 +853,7 @@ void BitcoinGUI::gotoSendCoinsPage()
 void BitcoinGUI::gotoBlockBrowserPage()
 {
     blockBrowserAction->setChecked(true);
-    centralWidget->setCurrentWidget(blockBrowser);
+    centralStackedWidget->setCurrentWidget(blockBrowser);
 
     exportAction->setEnabled(true);
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);

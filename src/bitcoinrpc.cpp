@@ -10,6 +10,7 @@
 #include "base58.h"
 #include "bitcoinrpc.h"
 #include "db.h"
+#include "rpcvelocity.h"
 
 #undef printf
 #include <boost/asio.hpp>
@@ -244,6 +245,7 @@ static const CRPCCommand vRPCCommands[] =
     { "getpeerinfo",            &getpeerinfo,            true,   false },
     { "getdifficulty",          &getdifficulty,          true,   false },
     { "getinfo",                &getinfo,                true,   false },
+    { "getvelocityinfo",        &getvelocityinfo,        true,   false },
     { "getsubsidy",             &getsubsidy,             true,   false },
     { "getmininginfo",          &getmininginfo,          true,   false },
     { "getstakinginfo",         &getstakinginfo,         true,   false },

@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = INSaNE-qt
-VERSION = 1.2.0.11
+VERSION = 1.2.1.0
 INCLUDEPATH += src src/json src/qt
 QT += core gui widgets network printsupport
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
@@ -32,13 +32,13 @@ MOC_DIR = build
 UI_DIR = build
 
 win32{
-BOOST_LIB_SUFFIX=-mgw62-mt-s-1_57
+BOOST_LIB_SUFFIX=-mgw61-mt-s-1_57
 BOOST_INCLUDE_PATH=C:/deps/boost_1_57_0
 BOOST_LIB_PATH=C:/deps/boost_1_57_0/stage/lib
 BDB_INCLUDE_PATH=C:/deps/db-6.1.26.NC/build_unix
 BDB_LIB_PATH=C:/deps/db-6.1.26.NC/build_unix
-OPENSSL_INCLUDE_PATH=C:/deps/openssl-1.0.1u/include
-OPENSSL_LIB_PATH=C:/deps/openssl-1.0.1u
+OPENSSL_INCLUDE_PATH=C:/deps/openssl-1.0.1t/include
+OPENSSL_LIB_PATH=C:/deps/openssl-1.0.1t
 MINIUPNPC_INCLUDE_PATH=C:/deps/
 MINIUPNPC_LIB_PATH=C:/deps/miniupnpc
 QRENCODE_INCLUDE_PATH=C:/deps/qrencode-3.4.4
@@ -222,6 +222,8 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/aboutdialog.h \
     src/qt/editaddressdialog.h \
     src/qt/bitcoinaddressvalidator.h \
+    src/velocity.h \
+    src/rpcvelocity.h \
     src/alert.h \
     src/addrman.h \
     src/base58.h \
@@ -333,6 +335,8 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/aboutdialog.cpp \
     src/qt/editaddressdialog.cpp \
     src/qt/bitcoinaddressvalidator.cpp \
+    src/velocity.cpp \
+    src/rpcvelocity.cpp \
     src/alert.cpp \
     src/version.cpp \
     src/sync.cpp \

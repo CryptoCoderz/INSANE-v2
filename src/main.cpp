@@ -11,6 +11,7 @@
 #include "init.h"
 #include "ui_interface.h"
 #include "kernel.h"
+#include "velocity.h"
 #include "zerocoin/Zerocoin.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
@@ -1041,7 +1042,12 @@ const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfSta
     return pindex;
 }
 
-static unsigned int GetNextTargetRequired_(const CBlockIndex* pindexLast, bool fProofOfStake)
+
+
+
+
+
+unsigned int PeercoinDiff(const CBlockIndex* pindexLast, bool fProofOfStake)
 {
     CBigNum bnTargetLimit = fProofOfStake ? bnProofOfStakeLimit : bnProofOfWorkLimit;
 
@@ -1056,12 +1062,12 @@ static unsigned int GetNextTargetRequired_(const CBlockIndex* pindexLast, bool f
         return bnTargetLimit.GetCompact(); // second block
 
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
-	
-	// Normalize atypical values
+    
+    // Normalize atypical values
     if (nActualSpacing < 1)
         nActualSpacing = 1;
-	if (nActualSpacing > nTargetSpacing * 8)
-		nActualSpacing = nTargetSpacing * 8;
+    if (nActualSpacing > nTargetSpacing * 8)
+        nActualSpacing = nTargetSpacing * 8;
 
     // ppcoin: target change every block
     // ppcoin: retarget with exponential moving toward target spacing
@@ -1077,9 +1083,104 @@ static unsigned int GetNextTargetRequired_(const CBlockIndex* pindexLast, bool f
     return bnNew.GetCompact();
 }
 
+unsigned int DarkGravityWave(const CBlockIndex* pindexLast, bool fProofOfStake)
+{
+        // DarkGravityWave v3.1, written by Evan Duffield - evan@dashpay.io
+        // Modified & revised by bitbandi for PoW support [implementation (fork) cleanup done by CryptoCoderz]
+        const CBigNum nProofOfWorkLimit = fProofOfStake ? bnProofOfStakeLimit : bnProofOfWorkLimit;
+        const CBlockIndex *BlockLastSolved = pindexLast;
+        const CBlockIndex *BlockLastSolved_lgf = GetLastBlockIndex(pindexLast, fProofOfStake);
+        const CBlockIndex *BlockReading = pindexLast;
+        // Low Gravity fix (PoW support)
+        if(pindexBest->nHeight > nlowGravity)
+        {
+            BlockReading = BlockLastSolved_lgf;
+        }
+        int64_t nActualTimespan = 0;
+        int64_t LastBlockTime = 0;
+        int64_t PastBlocksMin = 7;
+        int64_t PastBlocksMax = 24;
+        int64_t CountBlocks = 0;
+        CBigNum PastDifficultyAverage;
+        CBigNum PastDifficultyAveragePrev;
+
+        if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMax) {
+            return nProofOfWorkLimit.GetCompact();
+        }
+
+        for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
+            if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
+            CountBlocks++;
+
+            if(CountBlocks <= PastBlocksMin) {
+                if (CountBlocks == 1) { PastDifficultyAverage.SetCompact(BlockReading->nBits); }
+                else { PastDifficultyAverage = ((PastDifficultyAveragePrev * CountBlocks) + (CBigNum().SetCompact(BlockReading->nBits))) / (CountBlocks + 1); }
+                PastDifficultyAveragePrev = PastDifficultyAverage;
+            }
+
+            if(LastBlockTime > 0){
+                int64_t Diff = (LastBlockTime - BlockReading->GetBlockTime());
+                nActualTimespan += Diff;
+            }
+            LastBlockTime = BlockReading->GetBlockTime();
+            // Low Gravity chain support (Pre-fix)
+            if(pindexBest->nHeight <= nlowGravity)
+            {
+                if (BlockReading->pprev == NULL) { assert(BlockReading); break; }
+                    BlockReading = BlockReading->pprev;
+            }
+            // Low Gravity fix (PoW support)
+            else if(pindexBest->nHeight > nlowGravity)
+            {
+                BlockReading = GetLastBlockIndex(BlockReading->pprev, fProofOfStake);
+            }
+        }
+
+        CBigNum bnNew(PastDifficultyAverage);
+
+        int64_t _nTargetTimespan = CountBlocks * nTargetSpacing;
+
+        if (nActualTimespan < _nTargetTimespan/3)
+            nActualTimespan = _nTargetTimespan/3;
+        if (nActualTimespan > _nTargetTimespan*3)
+            nActualTimespan = _nTargetTimespan*3;
+
+        // Retarget
+        bnNew *= nActualTimespan;
+        bnNew /= _nTargetTimespan;
+
+        if (bnNew > nProofOfWorkLimit){
+            bnNew = nProofOfWorkLimit;
+        }
+
+        return bnNew.GetCompact();
+}
+
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake)
 {
-    return GetNextTargetRequired_(pindexLast, fProofOfStake);
+    unsigned int retarget = DIFF_DGW;
+
+    /* Chain starts with Peercoin per-block restarget,
+       PPC retarget difficulty runs for the initial 35k (thousand) blocks */
+    if(pindexBest->nHeight < nGravityFork)
+    {
+        retarget = DIFF_PPC;
+        // debug info for testing
+        // LogPrintf("PPC per-block retarget selected \n");
+    }
+    // Retarget using PPC
+    if (retarget == DIFF_PPC)
+    {
+        // debug info for testing
+        //LogPrintf("Espers retargetted using: PPC difficulty algo \n");
+        return PeercoinDiff(pindexLast, fProofOfStake);
+    }
+    // Retarget using Dark Gravity Wave v3
+    // debug info for testing
+    // LogPrintf("DarkGravityWave retarget selected \n");
+    //LogPrintf("Espers retargetted using: DGW-v3 difficulty algo \n");
+    return DarkGravityWave(pindexLast, fProofOfStake);
+
 }
 
 bool CheckProofOfWork(uint256 hash, unsigned int nBits)
@@ -2108,6 +2209,20 @@ bool CBlock::AcceptBlock()
     CBlockIndex* pindexPrev = (*mi).second;
     int nHeight = pindexPrev->nHeight+1;
 
+// Check block against Velocity parameters
+#ifdef __APPLE__
+    if(35000 > nHeight)
+#else   
+    if(Velocity_check(nHeight))
+#endif
+    {
+        // Announce Velocity constraint failure
+        if(!Velocity(pindexPrev, this))
+        {
+            return DoS(100, error("AcceptBlock() : Velocity rejected block %d, required parameters not met", nHeight));
+        }
+    }
+
     if (IsProofOfWork() && nHeight > LAST_POW_BLOCK)
         return DoS(100, error("AcceptBlock() : reject proof-of-work at height %d", nHeight));
 
@@ -2846,6 +2961,14 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             pfrom->fDisconnect = true;
             return false;
         }
+
+        if (pfrom->nVersion < MIN_PEER_PROTO_VERSION)
+         {
+             // disconnect from peers older than this proto version
+             printf("partner %s using obsolete version %i; disconnecting\n", pfrom->addr.ToString(), pfrom->nVersion);
+             pfrom->fDisconnect = true;
+             return false;
+         }
 
         if (pfrom->nVersion == 10300)
             pfrom->nVersion = 300;
