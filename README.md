@@ -1,7 +1,7 @@
 
 # Now hosted at: #
 
-<p><a href="https://github.com/insanecoin" target="_blank">Insanecoin</a></p>
+<p><a href="https://github.com/CryptoCoderz/INSANE-v2/" target="_blank">Insanecoin</a></p>
 
 ----
 
