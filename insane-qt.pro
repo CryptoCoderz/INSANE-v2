@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = INSaNE-qt
-VERSION = 1.2.1.0
+VERSION = 1.3.0.0
 INCLUDEPATH += src src/json src/qt
 QT += core gui widgets network printsupport
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
@@ -32,13 +32,13 @@ MOC_DIR = build
 UI_DIR = build
 
 win32{
-BOOST_LIB_SUFFIX=-mgw61-mt-s-1_57
-BOOST_INCLUDE_PATH=C:/deps/boost_1_57_0
-BOOST_LIB_PATH=C:/deps/boost_1_57_0/stage/lib
-BDB_INCLUDE_PATH=C:/deps/db-6.1.26.NC/build_unix
-BDB_LIB_PATH=C:/deps/db-6.1.26.NC/build_unix
-OPENSSL_INCLUDE_PATH=C:/deps/openssl-1.0.1t/include
-OPENSSL_LIB_PATH=C:/deps/openssl-1.0.1t
+BOOST_LIB_SUFFIX=-mgw63-mt-s-1_63
+BOOST_INCLUDE_PATH=C:/deps/boost_1_63_0
+BOOST_LIB_PATH=C:/deps/boost_1_63_0/stage/lib
+BDB_INCLUDE_PATH=C:/deps/db-6.2.23.NC/build_unix
+BDB_LIB_PATH=C:/deps/db-6.2.23.NC/build_unix
+OPENSSL_INCLUDE_PATH=C:/deps/openssl-1.0.2k/include
+OPENSSL_LIB_PATH=C:/deps/openssl-1.0.2k
 MINIUPNPC_INCLUDE_PATH=C:/deps/
 MINIUPNPC_LIB_PATH=C:/deps/miniupnpc
 QRENCODE_INCLUDE_PATH=C:/deps/qrencode-3.4.4
@@ -92,7 +92,7 @@ QMAKE_CXXFLAGS += -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2
 # for extra security on Windows: enable ASLR and DEP via GCC linker flags
 win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
 # on Windows: enable GCC large address aware linker flag
-win32:QMAKE_LFLAGS *= -Wl,--large-address-aware
+win32:QMAKE_LFLAGS *= -Wl,--large-address-aware -static
 # i686-w64-mingw32
 win32:QMAKE_LFLAGS *= -static-libgcc -static-libstdc++
 

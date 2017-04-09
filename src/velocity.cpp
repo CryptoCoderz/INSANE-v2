@@ -13,10 +13,9 @@ int VelocityI(int nHeight)
 {
     int i = 0;
     i --;
-    if(nHeight >= VELOCITY_HEIGHT[i])
-    {
-        i++;
-    }
+    BOOST_FOREACH(int h, VELOCITY_HEIGHT)
+    if( nHeight >= h )
+      i++;
     return i;
 }
 

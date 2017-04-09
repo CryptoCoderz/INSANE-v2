@@ -27,10 +27,12 @@ class CInv;
 class CRequestTracker;
 class CNode;
 
+// Define difficulty retarget algorithms
 enum DiffMode {
     DIFF_DEFAULT = 0, // Default to invalid 0
     DIFF_PPC     = 1, // Retarget using Peercoin per-block
     DIFF_DGW     = 2, // Retarget using DarkGravityWave v3
+    DIFF_VRX     = 3, // Retarget using Terminal-Velocity
 };
 
 static const int LAST_POW_BLOCK = 14000; // Approx 2.5 months
@@ -45,8 +47,9 @@ static const int64_t MIN_TX_FEE = 1000;
 static const int64_t MIN_RELAY_TX_FEE = MIN_TX_FEE;
 static const int64_t MIN_TX_COUNT = 0;
 static const int64_t MIN_TX_VALUE = 0.01 * COIN;
-static const int64_t BLOCK_SPACING = 8 * 60;
+static const int64_t BLOCK_SPACING = 10 * 60;
 static const int64_t BLOCK_SPACING_MIN = 6.5 * 60;
+static const int64_t BLOCK_SPACING_MAX = 12 * 60;
 static const int64_t MAX_MONEY = 2000000000 * COIN;
 static const int64_t COIN_YEAR_REWARD = 2 * CENT;
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
@@ -55,18 +58,17 @@ static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20
 static const int64_t nGravityFork = 35000; // Light INSaNE chain fork for DarkGravityWave and block time redux.
 static const int64_t nlowGravity = 35000; // Correct low gravity issue with DGW implementation.
 static const int64_t VELOCITY_TOGGLE = 35000; // Implementation of the Velocity system into the chain.
+static const int64_t VELOCITY_TDIFF = 37000; // Implementation of Terminal-Velocity-RateX [VRX]
+static const uint256 hashGenesisBlock("0x0000070752e39f4b9b3025ecc352b684691e67f43607100159d56b52e0a3cc64");
+static const uint256 hashGenesisBlockTestNet("0x0000fcb464524c60c088864e01dc65d89c3c7a4f08277ae212335d7fcaa9ce7c");
+inline int64_t PastDrift(int64_t nTime)   { return nTime - 60 * 60; } // up to 60 minutes from the past
+inline int64_t FutureDrift(int64_t nTime) { return nTime + 60 * 60; } // up to 60 minutes from the future
 
 #ifdef USE_UPNP
 static const int fHaveUPnP = true;
 #else
 static const int fHaveUPnP = false;
 #endif
-
-static const uint256 hashGenesisBlock("0x0000070752e39f4b9b3025ecc352b684691e67f43607100159d56b52e0a3cc64");
-static const uint256 hashGenesisBlockTestNet("0x");
-inline int64_t PastDrift(int64_t nTime)   { return nTime - 60 * 60; } // up to 60 minutes from the past
-inline int64_t FutureDrift(int64_t nTime) { return nTime + 60 * 60; } // up to 60 minutes from the future
-
 
 extern libzerocoin::Params* ZCParams;
 extern CScript COINBASE_FLAGS;

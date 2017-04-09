@@ -396,9 +396,17 @@ void BitcoinGUI::createMenuBar()
     help->addAction(aboutQtAction);
 }
 
+static QWidget* makeToolBarSpacer()
+{
+    QWidget* spacer = new QWidget();
+    spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    spacer->setStyleSheet("QWidget { background: none; }");
+    return spacer;
+}
+
 void BitcoinGUI::createToolBars()
 {
-    QToolBar *toolbar = addToolBar(tr("Tabs toolbar"));
+    toolbar = new QToolBar(tr("Tabs toolbar"));
     toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
     toolbar->setObjectName("tabs");
@@ -420,16 +428,7 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(addressBookAction);
     toolbar->addAction(blockBrowserAction);
     toolbar->addAction(exportAction);
-    toolbar->setMovable(false);
-
-  //  QToolBar *toolbar2 = addToolBar(tr("Actions toolbar"));
-  //  toolbar2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  //  toolbar2->addAction(exportAction);
-  //  toolbar2->setMovable(false);
-
-
-   // toolbar->addWidget(makeToolBarSpacer());
-
+    toolbar->addWidget(makeToolBarSpacer());
     toolbar->setOrientation(Qt::Vertical);
     toolbar->setMovable(false);
 
@@ -438,17 +437,6 @@ void BitcoinGUI::createToolBars()
     foreach(QAction *action, toolbar->actions()) {
           toolbar->widgetForAction(action)->setFixedWidth(145);
     }
-
-    // toolbar2->addWidget(makeToolBarSpacer());
-
-  //  toolbar2->setOrientation(Qt::Vertical);
-  //  toolbar2->setMovable(false);
-
-   // addToolBar(Qt::LeftToolBarArea, toolbar2);
-
-  //  foreach(QAction *action, toolbar2->actions()) {
-  //        toolbar2->widgetForAction(action)->setFixedWidth(145);
-  //  }
 }
 
 

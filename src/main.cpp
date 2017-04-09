@@ -978,7 +978,6 @@ int64_t GetProofOfWorkReward(int64_t nFees, int nHeight)
     return nSubsidy + nFees;
 }
 
-const int DAILY_BLOCKCOUNT =  1440 / 8;
 // miner's coin stake reward based on coin age spent (coin-days)
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
 {
@@ -1033,7 +1032,6 @@ unsigned int ComputeMinStake(unsigned int nBase, int64_t nTime, unsigned int nBl
     return ComputeMaxBits(bnProofOfStakeLimit, nBase, nTime);
 }
 
-
 // ppcoin: find last block index up to pindex
 const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake)
 {
@@ -1041,11 +1039,6 @@ const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfSta
         pindex = pindex->pprev;
     return pindex;
 }
-
-
-
-
-
 
 unsigned int PeercoinDiff(const CBlockIndex* pindexLast, bool fProofOfStake)
 {
@@ -1156,10 +1149,239 @@ unsigned int DarkGravityWave(const CBlockIndex* pindexLast, bool fProofOfStake)
         return bnNew.GetCompact();
 }
 
+unsigned int Terminal_Velocity_RateX(const CBlockIndex* pindexLast, bool fProofOfStake)
+{
+    // Terminal-Velocity-RateX, v10-Alpha-R1, written by Jonathan Dan Zaretsky - cryptocoderz@gmail.com
+    const CBigNum bnTerminalVelocity = fProofOfStake ? bnProofOfStakeLimit : bnProofOfWorkLimit;
+
+    // Check for block 0
+    if (pindexLast == NULL)
+        return bnTerminalVelocity.GetCompact(); // genesis block
+    // Differentiate PoW/PoS prev block
+    const CBlockIndex* BlockVelocityType = GetLastBlockIndex(pindexLast, fProofOfStake);
+    // Set prev blocks to check spacing
+    const CBlockIndex* BlockVelocityPrev1 = pindexLast;
+    if (BlockVelocityPrev1->pprev == NULL)
+        return bnTerminalVelocity.GetCompact(); // first block
+    const CBlockIndex* BlockVelocityPrevPrev1 = BlockVelocityPrev1->pprev;
+    if (BlockVelocityPrevPrev1->pprev == NULL)
+        return bnTerminalVelocity.GetCompact(); // second block
+    const CBlockIndex* BlockVelocityPrev2 = BlockVelocityPrevPrev1->pprev;
+    if (BlockVelocityPrev2->pprev == NULL)
+        return bnTerminalVelocity.GetCompact(); // third block
+    const CBlockIndex* BlockVelocityPrevPrev2 = BlockVelocityPrev2->pprev;
+    if (BlockVelocityPrevPrev2->pprev == NULL)
+        return bnTerminalVelocity.GetCompact(); // fourth block
+    const CBlockIndex* BlockVelocityPrev3 = BlockVelocityPrevPrev2->pprev;
+    if (BlockVelocityPrev3->pprev == NULL)
+        return bnTerminalVelocity.GetCompact(); // fifth block
+    const CBlockIndex* BlockVelocityPrevPrev3 = BlockVelocityPrev3->pprev;
+    if (BlockVelocityPrevPrev3->pprev == NULL)
+        return bnTerminalVelocity.GetCompact(); // sixth block
+
+    // Define values
+    double VLF1 = 0;
+    double VLF2 = 0;
+    double VLF3 = 0;
+    double VLF4 = 0;
+    double VLF5 = 0;
+    double VRFsm1 = 1;
+    double VRFdw1 = 0.75;
+    double VRFdw2 = 0.5;
+    double VRFup1 = 1.25;
+    double VRFup2 = 1.5;
+    double VRFup3 = 2;
+    double TerminalAverage = 0;
+    double TerminalFactor = 10000;
+    int64_t VLrate1 = 0;
+    int64_t VLrate2 = 0;
+    int64_t VLrate3 = 0;
+    int64_t VLrate4 = 0;
+    int64_t VLrate5 = 0;
+    int64_t DSrateNRM = BLOCK_SPACING;
+    int64_t DSrateMAX = BLOCK_SPACING_MAX;
+    int64_t FRrateDWN = DSrateNRM - 60;
+    int64_t FRrateFLR = DSrateNRM - 80;
+    int64_t FRrateCLNG = DSrateMAX * 3;
+    int64_t difficultyfactor = 0;
+    int64_t AverageDivisor = 5;
+    // Set standard values
+    VLrate1 = BlockVelocityPrev1->GetBlockTime() - BlockVelocityPrevPrev1->GetBlockTime();
+    VLrate2 = BlockVelocityPrevPrev1->GetBlockTime() - BlockVelocityPrev2->GetBlockTime();
+    VLrate3 = BlockVelocityPrev2->GetBlockTime() - BlockVelocityPrevPrev2->GetBlockTime();
+    VLrate4 = BlockVelocityPrevPrev2->GetBlockTime() - BlockVelocityPrev3->GetBlockTime();
+    VLrate5 = BlockVelocityPrev3->GetBlockTime() - BlockVelocityPrevPrev3->GetBlockTime();
+    // LogPrintf("Terminal-Velocity 1st spacing: %u: \n",VLrate1);
+    // LogPrintf("Terminal-Velocity 2nd spacing: %u: \n",VLrate2);
+    // LogPrintf("Terminal-Velocity 3rd spacing: %u: \n",VLrate3);
+    // LogPrintf("Terminal-Velocity 4th spacing: %u: \n",VLrate4);
+    // LogPrintf("Terminal-Velocity 5th spacing: %u: \n",VLrate5);
+    // LogPrintf("Desired normal spacing: %u: \n",DSrateNRM);
+    // LogPrintf("Desired maximum spacing: %u: \n",DSrateMAX);
+    // Check value round 1
+    if(VLrate1 >= DSrateNRM)
+    {
+        VLF1 = VRFsm1;
+        if(VLrate1 > DSrateMAX)
+        {
+            VLF1 = VRFdw1;
+            if(VLrate1 > FRrateCLNG)
+            {
+                VLF1 = VRFdw2;
+            }
+        }
+    }
+    else if(VLrate1 < DSrateNRM)
+    {
+        VLF1 = VRFup1;
+        if(VLrate1 < FRrateDWN)
+        {
+            VLF1 = VRFup2;
+            if(VLrate1 < FRrateFLR)
+            {
+                VLF1 = VRFup3;
+            }
+        }
+    }
+    // Check value round 2
+    if(VLrate2 >= DSrateNRM)
+    {
+        VLF2 = VRFsm1;
+        if(VLrate2 > DSrateMAX)
+        {
+            VLF2 = VRFdw1;
+            if(VLrate2 > FRrateCLNG)
+            {
+                VLF2 = VRFdw2;
+            }
+        }
+    }
+    else if(VLrate2 < DSrateNRM)
+    {
+        VLF2 = VRFup1;
+        if(VLrate2 < FRrateDWN)
+        {
+            VLF2 = VRFup2;
+            if(VLrate2 < FRrateFLR)
+            {
+                VLF2 = VRFup3;
+            }
+        }
+    }
+    // Check value round 3
+    if(VLrate3 >= DSrateNRM)
+    {
+        VLF3 = VRFsm1;
+        if(VLrate3 > DSrateMAX)
+        {
+            VLF3 = VRFdw1;
+            if(VLrate3 > FRrateCLNG)
+            {
+                VLF3 = VRFdw2;
+            }
+        }
+    }
+    else if(VLrate3 < DSrateNRM)
+    {
+        VLF3 = VRFup1;
+        if(VLrate3 < FRrateDWN)
+        {
+            VLF3 = VRFup2;
+            if(VLrate3 < FRrateFLR)
+            {
+                VLF3 = VRFup3;
+            }
+        }
+    }
+    // Check value round 4
+    if(VLrate4 >= DSrateNRM)
+    {
+        VLF4 = VRFsm1;
+        if(VLrate4 > DSrateMAX)
+        {
+            VLF4 = VRFdw1;
+            if(VLrate4 > FRrateCLNG)
+            {
+                VLF4 = VRFdw2;
+            }
+        }
+    }
+    else if(VLrate4 < DSrateNRM)
+    {
+        VLF4 = VRFup1;
+        if(VLrate4 < FRrateDWN)
+        {
+            VLF4 = VRFup2;
+            if(VLrate4 < FRrateFLR)
+            {
+                VLF4 = VRFup3;
+            }
+        }
+    }
+    // Check value round 5
+    if(VLrate5 >= DSrateNRM)
+    {
+        VLF5 = VRFsm1;
+        if(VLrate5 > DSrateMAX)
+        {
+            VLF5 = VRFdw1;
+            if(VLrate5 > FRrateCLNG)
+            {
+                VLF5 = VRFdw2;
+            }
+        }
+    }
+    else if(VLrate5 < DSrateNRM)
+    {
+        VLF5 = VRFup1;
+        if(VLrate5 < FRrateDWN)
+        {
+            VLF5 = VRFup2;
+            if(VLrate5 < FRrateFLR)
+            {
+                VLF5 = VRFup3;
+            }
+        }
+    }
+    // Final mathematics
+    // LogPrintf("Terminal-Velocity 1st multiplier set to: %f: \n",VLF1);
+    // LogPrintf("Terminal-Velocity 2nd multiplier set to: %f: \n",VLF2);
+    // LogPrintf("Terminal-Velocity 3rd multiplier set to: %f: \n",VLF3);
+    // LogPrintf("Terminal-Velocity 4th multiplier set to: %f: \n",VLF4);
+    // LogPrintf("Terminal-Velocity 5th multiplier set to: %f: \n",VLF5);
+    TerminalAverage = (VLF1 + VLF2 + VLF3 + VLF4 + VLF5) / AverageDivisor;
+    // LogPrintf("Terminal-Velocity averaged a final multiplier of: %f: \n",TerminalAverage);
+
+    // Retarget
+    CBigNum bnOld;
+    CBigNum bnNew;
+
+    TerminalFactor *= TerminalAverage;
+    difficultyfactor = TerminalFactor;
+    bnOld.SetCompact(BlockVelocityType->nBits);
+    bnNew = bnOld / difficultyfactor;
+    bnNew *= 10000;
+
+    if (bnNew > bnTerminalVelocity)
+      bnNew = bnTerminalVelocity;
+
+    // LogPrintf("Prior Terminal-Velocity: %08x  %s\n", BlockVelocityType->nBits, bnOld.ToString());
+    // LogPrintf("New Terminal-Velocity:  %08x  %s\n", bnNew.GetCompact(), bnNew.ToString());
+    return bnNew.GetCompact();
+}
+
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake)
 {
-    unsigned int retarget = DIFF_DGW;
+    // Default with VRX
+    unsigned int retarget = DIFF_VRX;
 
+    /* DarkGravityWave v3 retarget difficulty runs until block 667350 */
+    if(pindexBest->nHeight < VELOCITY_TDIFF)
+    {
+        retarget = DIFF_DGW;
+        // debug info for testing
+        // LogPrintf("DarkGravityWave-v3 retarget selected \n");
+    }
     /* Chain starts with Peercoin per-block restarget,
        PPC retarget difficulty runs for the initial 35k (thousand) blocks */
     if(pindexBest->nHeight < nGravityFork)
@@ -1168,19 +1390,25 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
         // debug info for testing
         // LogPrintf("PPC per-block retarget selected \n");
     }
-    // Retarget using PPC
-    if (retarget == DIFF_PPC)
+    // Retarget using DGW-v3
+    if (retarget == DIFF_DGW)
     {
         // debug info for testing
-        //LogPrintf("Espers retargetted using: PPC difficulty algo \n");
+        // LogPrintf("INSaNE retargetted using: DGW-v3 difficulty algo \n");
+        return DarkGravityWave(pindexLast, fProofOfStake);
+    }
+    // Retarget using PPC
+    else if (retarget == DIFF_PPC)
+    {
+        // debug info for testing
+        // LogPrintf("INSaNE retargetted using: PPC difficulty algo \n");
         return PeercoinDiff(pindexLast, fProofOfStake);
     }
-    // Retarget using Dark Gravity Wave v3
+    // Retarget using Terminal-Velocity
     // debug info for testing
-    // LogPrintf("DarkGravityWave retarget selected \n");
-    //LogPrintf("Espers retargetted using: DGW-v3 difficulty algo \n");
-    return DarkGravityWave(pindexLast, fProofOfStake);
-
+    // LogPrintf("Terminal-Velocity retarget selected \n");
+    // LogPrintf("INSaNE retargetted using: Terminal-Velocity difficulty curve \n");
+    return Terminal_Velocity_RateX(pindexLast, fProofOfStake);
 }
 
 bool CheckProofOfWork(uint256 hash, unsigned int nBits)
@@ -2209,12 +2437,8 @@ bool CBlock::AcceptBlock()
     CBlockIndex* pindexPrev = (*mi).second;
     int nHeight = pindexPrev->nHeight+1;
 
-// Check block against Velocity parameters
-#ifdef __APPLE__
-    if(35000 > nHeight)
-#else   
+    // Check block against Velocity parameters
     if(Velocity_check(nHeight))
-#endif
     {
         // Announce Velocity constraint failure
         if(!Velocity(pindexPrev, this))
@@ -2608,14 +2832,7 @@ bool LoadBlockIndex(bool fAllowNew)
 
         const char* pszTimestamp = "insane v2";
         CTransaction txNew;
-        if (!fTestNet)
-        {
-            txNew.nTime = 1476728426; 
-        }
-        else
-        {
-            txNew.nTime    = 1476727282; // Without separate txNew.nTime near block.nTime, CheckBlock fails on coinbase timestamp for TestNet created on 14042015
-        }                    
+        txNew.nTime = (!fTestNet ? 1476728431 : 1476727282);  // 1476728426
         txNew.vin.resize(1);
         txNew.vout.resize(1);
         txNew.vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
@@ -2625,37 +2842,12 @@ bool LoadBlockIndex(bool fAllowNew)
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1476728431; 
+        block.nTime    = (!fTestNet ? 1476728431 : 1476727282);
         block.nBits    = bnProofOfWorkLimit.GetCompact();
-        block.nNonce   = 1571167; 
-        if (fTestNet)				// No testnet, yet 1443884259
-        {
-            block.nTime    = 0;
-            block.nNonce   = 0;
-        }
-        if (true && (block.GetHash() != hashGenesisBlock)) {
-
-        // This will figure out a valid hash and Nonce if you're
-        // creating a different genesis block:
-            uint256 hashTarget = CBigNum().SetCompact(block.nBits).getuint256();
-            while (block.GetHash() > hashTarget)
-               {
-                   ++block.nNonce;
-                   if (block.nNonce == 0)
-                   {
-                       printf("NONCE WRAPPED, incrementing time");
-                       ++block.nTime;
-                   }
-               }
-        }
-        block.print();
-        printf("block.GetHash() == %s\n", block.GetHash().ToString().c_str());
-        printf("block.hashMerkleRoot == %s\n", block.hashMerkleRoot.ToString().c_str());
-        printf("block.nTime = %u \n", block.nTime);
-        printf("block.nNonce = %u \n", block.nNonce);
+        block.nNonce   = (!fTestNet ? 1571167 : 25788);
 
         // debug print
-        assert(block.hashMerkleRoot == uint256("0x0693303342b4c9f8e66d64fea27392915dc7b70a00cc1c912793611bc42d0cb0"));
+        assert(block.hashMerkleRoot == (!fTestNet ? uint256("0x0693303342b4c9f8e66d64fea27392915dc7b70a00cc1c912793611bc42d0cb0") : uint256("0xf59306c356fd9b2fbe74edb72c2664bcb869130677766a8e36eaec7d3d57814a")));
         block.print();
         assert(block.GetHash() == (!fTestNet ? hashGenesisBlock : hashGenesisBlockTestNet));
         assert(block.CheckBlock());

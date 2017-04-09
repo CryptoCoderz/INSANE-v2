@@ -60,6 +60,7 @@ private:
     ClientModel *clientModel;
     WalletModel *walletModel;
 
+    QToolBar *toolbar;
     QStackedWidget *centralStackedWidget;
 
     OverviewPage *overviewPage;

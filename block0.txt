@@ -5,27 +5,65 @@ Insanecoin
 
 
 
-  {
-  "hash": "0000070752e39f4b9b3025ecc352b684691e67f43607100159d56b52e0a3cc64", // Genesis
+  
+{
+  
+	"hash": "0000070752e39f4b9b3025ecc352b684691e67f43607100159d56b52e0a3cc64", 
+	// Genesis
   "confirmations": 9966,
-  "size": 159,
-  "height": 0,
-  "version": 1,
-  "merkleroot": "0693303342b4c9f8e66d64fea27392915dc7b70a00cc1c912793611bc42d0cb0", // Hash Merkle Root
-  "mint": 0,
-  "time": 1476728431, // Unix Time
-  "nonce": 1571167, // Nonce
-  "bits": "1e0fffff",
-  "difficulty": 0.00024414,
-  "blocktrust": "100001",
-  "chaintrust": "100001",
-  "nextblockhash": "00000db71320614c35bc9472241866cc2731fc77d0f7aa7b74996bcf204f9d21",
-  "flags": "proof-of-work stake-modifier",
-  "proofhash": "0000070752e39f4b9b3025ecc352b684691e67f43607100159d56b52e0a3cc64",
-  "entropybit": 0,
-  "modifier": "0000000000000000",
-  "modifierchecksum": "fd11f4e7",
-  "tx": [
+  
+	"size": 159,
+  
+	"height": 0,
+  
+	"version": 1,
+  
+	"merkleroot": "0693303342b4c9f8e66d64fea27392915dc7b70a00cc1c912793611bc42d0cb0", 
+	// Hash Merkle Root
+  
+	"mint": 0,
+  
+	"time": 1476728431, 
+	// Unix Time
+  
+	"nonce": 1571167, 
+	// Nonce
+  
+	"bits": "1e0fffff",
+  
+	"difficulty": 0.00024414,
+  
+	"blocktrust": "100001",
+  
+	"chaintrust": "100001",
+  
+	"nextblockhash": "00000db71320614c35bc9472241866cc2731fc77d0f7aa7b74996bcf204f9d21",
+  
+	"flags": "proof-of-work stake-modifier",
+  
+	"proofhash": "0000070752e39f4b9b3025ecc352b684691e67f43607100159d56b52e0a3cc64",
+  
+	"entropybit": 0,
+  
+	"modifier": "0000000000000000",
+  
+	"modifierchecksum": "fd11f4e7",
+  
+	"tx": [
     "0693303342b4c9f8e66d64fea27392915dc7b70a00cc1c912793611bc42d0cb0"
   ]
+
+}
+
+Insane: Testnet Hash
+{
+CBlock(hash=0000fcb464524c60c088864e01dc65d89c3c7a4f08277ae212335d7fcaa9ce7c, ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000, hashMerkleRoot=f59306c356fd9b2fbe74edb72c2664bcb869130677766a8e36eaec7d3d57814a, nTime=1476727282, nBits=1f00ffff, nNonce=25788, vtx=1, vchBlockSig=)
+  Coinbase(hash=f59306c356, nTime=1476727282, ver=1, vin.size=1, vout.size=1, nLockTime=0)
+    CTxIn(COutPoint(0000000000, 4294967295), coinbase 00012a09696e73616e65207632)
+    CTxOut(empty)
+  vMerkleTree: f59306c356 
+block.GetHash() == 0000fcb464524c60c088864e01dc65d89c3c7a4f08277ae212335d7fcaa9ce7c
+block.hashMerkleRoot == f59306c356fd9b2fbe74edb72c2664bcb869130677766a8e36eaec7d3d57814a
+block.nTime = 1476727282 
+block.nNonce = 25788 
 }

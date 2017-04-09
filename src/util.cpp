@@ -1090,7 +1090,7 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
     if (!streamConfig.good())
     {
         boost::filesystem::path ConfPath;
-               ConfPath = GetDefaultDataDir() / "INSaNE.conf";
+               ConfPath = GetDataDir() / "INSaNE.conf";
                FILE* ConfFile = fopen(ConfPath.string().c_str(), "w");
                fprintf(ConfFile, "listen=1\n");
                fprintf(ConfFile, "server=1\n");
@@ -1109,27 +1109,37 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
                fprintf(ConfFile, "port=8028\n");
                fprintf(ConfFile, "rpcport=8029\n");
                fprintf(ConfFile, "rpcconnect=127.0.0.1\n");
-               fprintf(ConfFile, "addnode=199.26.184.214:8028\n");
-               fprintf(ConfFile, "addnode=91.134.120.210:8028\n");
-               fprintf(ConfFile, "addnode=149.56.154.75:8028\n");
-               fprintf(ConfFile, "addnode=81.2.60.228:8028\n");
-               fprintf(ConfFile, "addnode=80.4.22.161:8028\n");
-               fprintf(ConfFile, "addnode=47.184.156.17:8028\n");
-               fprintf(ConfFile, "addnode=164.132.176.67:8028\n");
-               fprintf(ConfFile, "addnode=104.251.218.69:8028\n");
-               fprintf(ConfFile, "addnode=164.132.151.91:8028\n");
+               fprintf(ConfFile, "rpcallowip=127.0.0.1\n");
+               fprintf(ConfFile, "addnode=84.162.255.106\n");
+               fprintf(ConfFile, "addnode=109.81.210.190\n");
+               fprintf(ConfFile, "addnode=46.18.47.191\n");
+               fprintf(ConfFile, "addnode=85.132.55.7\n");
+               fprintf(ConfFile, "addnode=172.115.243.110\n");
+               fprintf(ConfFile, "addnode=94.20.37.161\n");
+               fprintf(ConfFile, "addnode=94.20.242.60\n");
+               fprintf(ConfFile, "addnode=89.148.221.84\n");
+               fprintf(ConfFile, "addnode=5.134.52.243\n");
+               fprintf(ConfFile, "addnode=94.20.192.117\n");
+               fprintf(ConfFile, "addnode=79.56.59.79\n");
+               fprintf(ConfFile, "addnode=5.189.156.99\n");
+               fprintf(ConfFile, "addnode=99.99.158.1\n");
+               fprintf(ConfFile, "addnode=46.17.147.188\n");
+               fprintf(ConfFile, "addnode=81.243.68.58\n");
+               fprintf(ConfFile, "addnode=173.212.196.182\n");
+               fprintf(ConfFile, "addnode=185.55.36.30\n");
+               fprintf(ConfFile, "addnode=174.24.48.199\n");
 
                fclose(ConfFile);
 
-               // Returns our config path, created config file is NOT loaded first time...
-               // Wallet will need to be reloaded before config file is properly read...
+               // Returns our config path, created config file is loaded during initial run...
                return ;
+    }
 
-               if (confLoop < 1)
-               {
-               ++confLoop;
-               goto injectConfig;
-               }
+    // Wallet will reload config file so it is properly read...
+    if (confLoop < 1)
+    {
+        ++confLoop;
+        goto injectConfig;
     }
 
     set<string> setOptions;
