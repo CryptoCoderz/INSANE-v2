@@ -77,6 +77,8 @@ OBJS= \
     obj/main.o \
     obj/miner.o \
     obj/net.o \
+    obj/velocity.o \
+    obj/rpcvelocity.o \
     obj/protocol.o \
     obj/bitcoinrpc.o \
     obj/rpcdump.o \
