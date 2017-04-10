@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = INSaNE-qt
-VERSION = 1.3.0.0
+VERSION = 1.3.0.1
 INCLUDEPATH += src src/json src/qt
 QT += core gui widgets network printsupport
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
